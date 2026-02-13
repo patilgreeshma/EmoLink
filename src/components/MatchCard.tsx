@@ -1,5 +1,6 @@
 import { UserProfile, GrowthGoal, currentUser } from "@/data/mockData";
 import GoalTag from "./GoalTag";
+import FollowButton from "./FollowButton";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 
@@ -29,6 +30,11 @@ const MatchCard = ({ user, onConnect }: MatchCardProps) => {
         </div>
       </div>
 
+      <div className="flex gap-3 text-xs text-muted-foreground mb-3">
+        <span><strong className="text-foreground">{user.followers}</strong> followers</span>
+        <span><strong className="text-foreground">{user.following}</strong> following</span>
+      </div>
+
       <div className="mb-4">
         <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Shared Goals</p>
         <div className="flex flex-wrap gap-1.5">
@@ -43,9 +49,12 @@ const MatchCard = ({ user, onConnect }: MatchCardProps) => {
         </div>
       </div>
 
-      <Button onClick={onConnect} className="w-full rounded-full" size="sm">
-        Connect
-      </Button>
+      <div className="flex gap-2">
+        <Button onClick={onConnect} className="flex-1 rounded-full" size="sm">
+          Connect
+        </Button>
+        <FollowButton initialFollowing={user.isFollowing} size="sm" />
+      </div>
     </div>
   );
 };

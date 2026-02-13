@@ -11,6 +11,9 @@ import GoalSelection from "./pages/GoalSelection";
 import Discover from "./pages/Discover";
 import Chat from "./pages/Chat";
 import Profile from "./pages/Profile";
+import Feed from "./pages/Feed";
+import Communities from "./pages/Communities";
+import CommunityPage from "./pages/CommunityPage";
 
 const queryClient = new QueryClient();
 
@@ -25,7 +28,10 @@ const App = () => (
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/goals" element={<GoalSelection />} />
+          <Route path="/feed" element={<Feed />} />
           <Route path="/discover" element={<Discover />} />
+          <Route path="/communities" element={<Communities />} />
+          <Route path="/community/:id" element={<CommunityPage />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />

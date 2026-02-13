@@ -12,7 +12,10 @@ const PostCard = ({ post }: PostCardProps) => {
   const [liked, setLiked] = useState(post.liked ?? false);
   const [likeCount, setLikeCount] = useState(post.likes);
 
-  const author = post.authorId === "me" ? currentUser : matchedUsers.find((u) => u.id === post.authorId);
+  // Check if author is already populated (backend) or needs lookup (mock)
+  // @ts-ignore
+  const author = post.author || (post.authorId === "me" ? currentUser : matchedUsers.find((u) => u.id === post.authorId));
+
   if (!author) return null;
 
   const toggleLike = () => {

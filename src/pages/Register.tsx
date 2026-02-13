@@ -1,24 +1,51 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import api from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sprout } from "lucide-react";
 import type { LifeStage } from "@/data/mockData";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { toast } from "sonner";
 
 const lifeStages: LifeStage[] = ["Student", "Early Career", "Mid Career", "Founder", "Career Break"];
 
+const registerSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  lifeStage: z.string().min(1, { message: "Please select a life stage" }),
+});
+
 const Register = () => {
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [lifeStage, setLifeStage] = useState<string>("");
+  const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    navigate("/goals");
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit = async (values: z.infer<typeof registerSchema>) => {
+    try {
+      const { data } = await api.post("/auth/register", values);
+      console.log("Register success:", data);
+      login(data.token, data);
+      toast.success("Account created successfully!");
+      navigate("/goals");
+    } catch (error: any) {
+      console.error("Register error:", error);
+      toast.error(error.response?.data?.message || "Registration failed. Please try again.");
+    }
   };
 
   return (
@@ -32,22 +59,42 @@ const Register = () => {
           <p className="text-muted-foreground">Begin your growth journey</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="gradient-card rounded-2xl p-8 shadow-warm-lg border border-border space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="gradient-card rounded-2xl p-8 shadow-warm-lg border border-border space-y-5">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="rounded-xl" required />
+            <Input
+              id="name"
+              placeholder="Your name"
+              className="rounded-xl"
+              {...register("name")}
+            />
+            {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="rounded-xl" required />
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              className="rounded-xl"
+              {...register("email")}
+            />
+            {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="rounded-xl" required />
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              className="rounded-xl"
+              {...register("password")}
+            />
+            {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
           </div>
           <div className="space-y-2">
             <Label>Life Stage</Label>
-            <Select value={lifeStage} onValueChange={setLifeStage}>
+            <Select onValueChange={(val) => setValue("lifeStage", val)}>
               <SelectTrigger className="rounded-xl">
                 <SelectValue placeholder="Select your life stage" />
               </SelectTrigger>
@@ -57,9 +104,10 @@ const Register = () => {
                 ))}
               </SelectContent>
             </Select>
+            {errors.lifeStage && <p className="text-sm text-red-500">{errors.lifeStage.message}</p>}
           </div>
-          <Button type="submit" className="w-full rounded-full" size="lg">
-            Create Account
+          <Button type="submit" className="w-full rounded-full" size="lg" disabled={isSubmitting}>
+            {isSubmitting ? "Creating Account..." : "Create Account"}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}

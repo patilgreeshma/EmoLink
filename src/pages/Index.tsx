@@ -62,7 +62,7 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <Link to="/register">
+        <Link to="/feed">
               <Button size="lg" className="rounded-full px-8 gap-2 text-base shadow-warm-lg">
                 Get Started <ArrowRight className="w-4 h-4" />
               </Button>

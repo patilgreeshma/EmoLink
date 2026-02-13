@@ -1,73 +1,61 @@
-# Welcome to your Lovable project
+Project Walkthrough - Emotion-Based Networking Platform
+1. Backend Implementation (Completed)
+MVC Architecture: Implemented with server/ directory structure.
+Tech Stack: Node.js, Express, MongoDB (Mongoose), JWT Authentication.
+Key Features:
+Authentication: Register/Login with JWT cookies/headers.
+Database: Schemas for User, Post, Community, Chat, Message.
+API Endpoints: RESTful routes for all features.
+ES Modules: Fully refactored to use import/export.
+2. Frontend Integration (Completed)
+API Connection: Created 
+src/lib/api.ts
+ with Axios interceptors for automatic token handling.
+Authentication:
+Connected 
+Login.tsx
+ and 
+Register.tsx
+ to backend.
+Implemented 
+AuthContext
+ for global user state management.
+Core Features:
+Feed: Fetches real posts from backend. Uses optimistic updates for new posts.
+Create Post: Fully functional with backend API.
+Discover: Fetches compatible users from /api/match endpoint.
+Profile: Displays real user data and posts from backend.
+Chat: Real-time-ish messaging (polling/fetch on load) connected to backend 
+Chat
+ and 
+Message
+ models.
+3. How to Run & Verify
+Prerequisites
+MongoDB: Ensure your .env has the correct MONGO_URI.
+Backend: Running on port 5000.
+Frontend: Running on port 5173 (Vite default).
+Steps
+Start Backend:
 
-## Project info
+bash
+npm run server
+# Output should say: Server running on port 5000 / MongoDB Connected
+Start Frontend:
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
-
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+bash
 npm run dev
-```
+# Open http://localhost:5173
+Test Flow:
 
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Register: Create a new account.
+Feed: You should see an empty feed (or seed data if added). Create a post.
+Discover: Go to Discover page. You might see other users if they exist in DB.
+Profile: Check your profile page.
+Chat: Go to Chat. (Note: To test chat, you need at least 2 users in the DB and an existing conversation. You can manually create a chat or use Postman for now to initiate one if UI button is missing).
+4. Next Steps / Known Limitations
+Chat Initiation: Currently 
+Chat.tsx
+ lists existing chats. We need to add a "Message" button on user profiles to start a new chat.
+Community: The Community features are still using mock data for the list view, though the backend models exist.
+Real-time: Chat uses polling/fetch-on-load. Socket.io could be added for true real-time updates.

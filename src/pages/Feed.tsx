@@ -16,18 +16,17 @@ const Feed = () => {
 
   const fetchPosts = async () => {
     try {
-      console.log("Fetching global feed...");
       const { data } = await api.get("/posts/feed");
-      console.log("Feed data received:", data.length, "posts");
+
       // Map backend data to frontend Post interface
       const mappedPosts = data.map((p: any) => ({
         id: p._id,
-        authorId: p.author._id,
+        authorId: p.author?._id || "deleted",
         author: {
-          id: p.author._id,
-          name: p.author.name,
-          avatar: p.author.avatar || p.author.name.substring(0, 2).toUpperCase(),
-          lifeStage: p.author.lifeStage,
+          id: p.author?._id || "unknown",
+          name: p.author?.name || "Unknown User",
+          avatar: p.author?.avatar || (p.author?.name ? p.author.name.substring(0, 2).toUpperCase() : "??"),
+          lifeStage: p.author?.lifeStage || "Member",
         },
         content: p.content,
         tags: p.growthTags || [],
@@ -36,7 +35,7 @@ const Feed = () => {
         comments: p.comments.length,
         liked: p.likes.includes(user?._id),
         communityId: p.community?._id,
-        communityName: p.community?.name, // Add community name for display if needed
+        communityName: p.community?.name,
         image: p.image
       }));
       setPosts(mappedPosts);
@@ -76,6 +75,11 @@ const Feed = () => {
             <CreatePost onPost={handleNewPost} />
             {loading ? (
               <p className="text-center text-muted-foreground">Loading feed...</p>
+            ) : posts.length === 0 ? (
+              <div className="text-center py-12 bg-card rounded-lg border border-border">
+                <p className="text-muted-foreground mb-2">No posts yet</p>
+                <p className="text-sm text-muted-foreground">Be the first to share something with the community!</p>
+              </div>
             ) : (
               posts.map((post) => (
                 <PostCard key={post.id} post={post} />

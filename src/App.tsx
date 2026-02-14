@@ -14,6 +14,7 @@ import CommunityPage from "./pages/CommunityPage";
 import Chat from "./pages/Chat";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import FloatingChatbot from "@/components/FloatingChatbot";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        <FloatingChatbot />
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>

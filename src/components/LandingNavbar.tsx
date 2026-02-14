@@ -7,7 +7,7 @@ const LandingNavbar = () => (
     <div className="container mx-auto px-4 flex items-center justify-between h-16">
       <Link to="/" className="flex items-center gap-2 text-primary font-heading font-bold text-xl">
         <Sprout className="w-6 h-6" />
-        Bloomly
+        Emo-Link
       </Link>
       <div className="flex items-center gap-3">
         <Link to="/login">

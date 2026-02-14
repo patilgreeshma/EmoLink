@@ -16,6 +16,7 @@ import communityRoutes from './routes/communityRoutes.js';
 import matchRoutes from './routes/matchRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import searchRoutes from './routes/searchRoutes.js';
+import aiChatRoutes from './routes/aiChatRoutes.js';
 
 dotenv.config();
 
@@ -46,6 +47,7 @@ app.use('/api/communities', communityRoutes);
 app.use('/api/match', matchRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/ai-chat', aiChatRoutes);
 
 // Serve static files
 import path from 'path';

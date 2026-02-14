@@ -46,7 +46,7 @@ const Index = () => {
             className="text-4xl md:text-6xl font-heading font-bold text-foreground mb-6 leading-tight"
           >
             Connect Through{" "}
-            <span className="text-gradient">Growth</span>,{" "}
+            <span className="text-gradient">Emotion</span>,{" "}
             Not Titles
           </motion.h1>
           <motion.p
@@ -62,7 +62,7 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-        <Link to="/feed">
+            <Link to="/feed">
               <Button size="lg" className="rounded-full px-8 gap-2 text-base shadow-warm-lg">
                 Get Started <ArrowRight className="w-4 h-4" />
               </Button>
@@ -75,7 +75,7 @@ const Index = () => {
       <section className="py-20 px-4 bg-background">
         <div className="container mx-auto max-w-5xl">
           <h2 className="text-3xl font-heading font-bold text-center mb-12 text-foreground">
-            Why Bloomly?
+            Why Emo-Link?
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, i) => (
@@ -110,7 +110,7 @@ const Index = () => {
           </p>
           <Link to="/register">
             <Button size="lg" className="rounded-full px-8 gap-2 shadow-warm-lg">
-              Join Bloomly <ArrowRight className="w-4 h-4" />
+              Join Emo-Link <ArrowRight className="w-4 h-4" />
             </Button>
           </Link>
         </div>
@@ -119,14 +119,14 @@ const Index = () => {
       {/* Footer */}
       <footer className="bg-card border-t border-border py-10 px-4">
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <p className="font-heading font-semibold text-foreground">Bloomly</p>
+          <p className="font-heading font-semibold text-foreground">Emo-Link</p>
           <div className="flex gap-6">
             <span className="hover:text-foreground cursor-pointer transition-colors">About</span>
             <span className="hover:text-foreground cursor-pointer transition-colors">Privacy</span>
             <span className="hover:text-foreground cursor-pointer transition-colors">Terms</span>
             <span className="hover:text-foreground cursor-pointer transition-colors">Contact</span>
           </div>
-          <p>© 2026 Bloomly. All rights reserved.</p>
+          <p>© 2026 Emo-Link. All rights reserved.</p>
         </div>
       </footer>
     </div>

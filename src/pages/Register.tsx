@@ -54,7 +54,7 @@ const Register = () => {
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 text-primary font-heading font-bold text-2xl mb-2">
             <Sprout className="w-7 h-7" />
-            VibeConnect
+            Emo-Link
           </Link>
           <p className="text-muted-foreground">Begin your growth journey</p>
         </div>

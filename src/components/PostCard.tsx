@@ -90,17 +90,17 @@ const PostCard = ({ post, onDelete }: PostCardProps) => {
       <div className="gradient-card rounded-2xl p-5 shadow-warm border border-border relative group">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0 overflow-hidden">
-            {author.avatar ? (
-              <img src={author.avatar} alt={author.name} className="w-full h-full object-cover" />
+            {author?.avatar ? (
+              <img src={author.avatar} alt={author.name || "User"} className="w-full h-full object-cover" />
             ) : (
               <div className="flex items-center justify-center w-full h-full bg-primary/10 text-primary font-bold">
-                {author.name ? author.name.charAt(0).toUpperCase() : "?"}
+                {author?.name ? author.name.charAt(0).toUpperCase() : "?"}
               </div>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-heading font-bold text-sm text-foreground">{author.name}</p>
-            <p className="text-xs text-muted-foreground">{author.lifeStage} · {new Date(post.createdAt || post.timestamp).toLocaleDateString()}</p>
+            <p className="font-heading font-bold text-sm text-foreground">{author?.name || "Unknown User"}</p>
+            <p className="text-xs text-muted-foreground">{author?.lifeStage || "Member"} · {new Date(post.createdAt || post.timestamp).toLocaleDateString()}</p>
           </div>
 
           {isAuthor && (

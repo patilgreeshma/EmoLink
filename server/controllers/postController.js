@@ -1,24 +1,56 @@
 import Post from '../models/Post.js';
 import User from '../models/User.js';
+import cloudinary from '../config/cloudinary.js';
+import streamifier from 'streamifier';
 
 // @desc    Create a new post
 // @route   POST /api/posts
 // @access  Private
 export const createPost = async (req, res) => {
-    if (!req.body.content) {
-        return res.status(400).json({ message: 'Please add content' });
-    }
+    const { content, communityId, growthTags } = req.body;
+
+    // Helper function to upload to Cloudinary
+    const uploadFromBuffer = (buffer) => {
+        return new Promise((resolve, reject) => {
+            const cld_upload_stream = cloudinary.uploader.upload_stream(
+                {
+                    folder: "emolink_posts"
+                },
+                (error, result) => {
+                    if (result) {
+                        resolve(result);
+                    } else {
+                        reject(error);
+                    }
+                }
+            );
+            streamifier.createReadStream(buffer).pipe(cld_upload_stream);
+        });
+    };
 
     try {
+        let imageUrl = '';
+
+        if (req.file) {
+            const result = await uploadFromBuffer(req.file.buffer);
+            imageUrl = result.secure_url;
+        }
+
+        if (!content && !imageUrl) {
+            return res.status(400).json({ message: 'Please add content or an image' });
+        }
+
         const post = await Post.create({
             author: req.user.id,
-            content: req.body.content,
-            growthTags: req.body.growthTags,
-            community: req.body.community || null
+            content,
+            growthTags: growthTags,
+            community: communityId || null,
+            image: imageUrl
         });
 
         res.status(201).json(post);
     } catch (error) {
+        console.error("Post creation error:", error);
         res.status(500).json({ message: error.message });
     }
 };

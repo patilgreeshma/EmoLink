@@ -33,7 +33,9 @@ const io = new Server(httpServer, {
 // Middleware
 app.use(express.json());
 app.use(cors());
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(morgan('dev'));
 
 // Routes
@@ -44,6 +46,15 @@ app.use('/api/communities', communityRoutes);
 app.use('/api/match', matchRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/search', searchRoutes);
+
+// Serve static files
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Error Middleware
 app.use(errorHandler);

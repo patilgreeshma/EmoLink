@@ -36,7 +36,8 @@ const Feed = () => {
         comments: p.comments.length,
         liked: p.likes.includes(user?._id),
         communityId: p.community?._id,
-        communityName: p.community?.name // Add community name for display if needed
+        communityName: p.community?.name, // Add community name for display if needed
+        image: p.image
       }));
       setPosts(mappedPosts);
     } catch (error) {

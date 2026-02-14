@@ -17,6 +17,7 @@ const CreatePost = ({ onPost }: CreatePostProps) => {
   const [selectedTags, setSelectedTags] = useState<GrowthGoal[]>([]);
   const [showTags, setShowTags] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [image, setImage] = useState<File | null>(null);
 
   const toggleTag = (tag: GrowthGoal) => {
     setSelectedTags((prev) =>
@@ -25,18 +26,32 @@ const CreatePost = ({ onPost }: CreatePostProps) => {
   };
 
   const handlePost = async () => {
-    if (!content.trim()) return;
+    if (!content.trim() && !image) return;
 
     setIsSubmitting(true);
     try {
-      const { data } = await api.post("/posts", {
-        content,
-        growthTags: selectedTags
+      const formData = new FormData();
+      formData.append("content", content);
+      selectedTags.forEach(tag => formData.append("growthTags[]", tag)); // Assuming backend handles array or repeated keys. Actually postController expects array in body, but with multer/formData it's different.
+      // Wait, postController expects req.body.growthTags. Middleware might parse it if we use a library or just standard form fields.
+      // Easiest is to send as JSON string if complex, or just append multiple times.
+      // Let's use JSON string for tags to be safe if backend doesn't auto-parse arrays from formData deeply. 
+      // Actually standard multer handles text fields. `growthTags` might come as array if appended multiple times.
+      // Let's stick to simple appending.
+      selectedTags.forEach(tag => formData.append("growthTags", tag));
+
+      if (image) {
+        formData.append("image", image);
+      }
+
+      const { data } = await api.post("/posts", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       onPost?.(data);
       setContent("");
       setSelectedTags([]);
+      setImage(null);
       setShowTags(false);
       toast.success("Post shared! 🌱");
     } catch (error) {
@@ -87,13 +102,24 @@ const CreatePost = ({ onPost }: CreatePostProps) => {
       )}
 
       <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-        <button
-          onClick={() => setShowTags(!showTags)}
-          className="text-xs text-muted-foreground hover:text-primary transition-colors"
-        >
-          {showTags ? "Hide tags" : "+ Add tags"}
-        </button>
-        <Button size="sm" className="rounded-full" onClick={handlePost} disabled={!content.trim() || isSubmitting}>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowTags(!showTags)}
+            className="text-xs text-muted-foreground hover:text-primary transition-colors"
+          >
+            {showTags ? "Hide tags" : "+ Add tags"}
+          </button>
+          <label className="text-xs text-muted-foreground hover:text-primary transition-colors cursor-pointer flex items-center gap-1">
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*"
+              onChange={(e) => setImage(e.target.files?.[0] || null)}
+            />
+            {image ? <span className="text-primary truncate max-w-[100px]">{image.name}</span> : "+ Image"}
+          </label>
+        </div>
+        <Button size="sm" className="rounded-full" onClick={handlePost} disabled={(!content.trim() && !image) || isSubmitting}>
           {isSubmitting ? "Posting..." : "Post"}
         </Button>
       </div>

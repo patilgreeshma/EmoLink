@@ -54,6 +54,7 @@ export interface Post {
   liked?: boolean;
   communityId?: string;
   communityName?: string;
+  image?: string;
 }
 
 export interface Community {

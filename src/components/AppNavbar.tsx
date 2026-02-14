@@ -22,7 +22,7 @@ const AppNavbar = () => {
       <div className="container mx-auto px-4 flex items-center justify-between h-14 gap-4">
         <Link to="/feed" className="flex items-center gap-2 text-primary font-heading font-bold text-xl shrink-0">
           <Sprout className="w-6 h-6" />
-          <span className="hidden sm:inline">Bloomly</span>
+          <span className="hidden sm:inline">VibeConnect</span>
         </Link>
 
         {/* Search - center */}

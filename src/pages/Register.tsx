@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 
-const lifeStages: LifeStage[] = ["Student", "Early Career", "Mid Career", "Founder", "Career Break"];
+const lifeStages: LifeStage[] = ["Healing", "Building confidence", "Finding purpose", "Managing anxiety", "Expanding social circle", "Reinventing myself", "Other"];
 
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -54,7 +54,7 @@ const Register = () => {
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 text-primary font-heading font-bold text-2xl mb-2">
             <Sprout className="w-7 h-7" />
-            Bloomly
+            VibeConnect
           </Link>
           <p className="text-muted-foreground">Begin your growth journey</p>
         </div>

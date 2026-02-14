@@ -5,7 +5,7 @@ import User from '../models/User.js';
 // @route   POST /api/communities
 // @access  Private
 export const createCommunity = async (req, res) => {
-    const { name, description } = req.body;
+    const { name, description, icon } = req.body;
 
     if (!name || !description) {
         return res.status(400).json({ message: 'Please add all fields' });
@@ -15,6 +15,7 @@ export const createCommunity = async (req, res) => {
         const community = await Community.create({
             name,
             description,
+            icon: icon || '🌱',
             createdBy: req.user.id,
             members: [req.user.id] // Creator joins automatically
         });

@@ -8,8 +8,8 @@ import { Search } from "lucide-react";
 import { toast } from "sonner";
 import api from "@/lib/api";
 
-const stages: LifeStage[] = ["Student", "Early Career", "Mid Career", "Founder", "Career Break"];
 
+const stages: LifeStage[] = ["Healing", "Building confidence", "Finding purpose", "Managing anxiety", "Expanding social circle", "Reinventing myself", "Other"];
 const Discover = () => {
   const [filter, setFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
@@ -28,9 +28,10 @@ const Discover = () => {
           growthStatement: u.bio || "Growing every day 🌱",
           avatar: u.avatar || u.name.substring(0, 2).toUpperCase(),
           compatibility: u.compatibility || 0,
-          followers: u.followers?.length || 0, // Backend might return array of IDs
-          following: u.following?.length || 0,
-          isFollowing: false, // Default, can be updated if backend sends this info
+          followers: u.followers || 0,
+          following: u.following || 0,
+          isFollowing: u.isFollowing || false,
+          matchReason: u.matchReason
         }));
         setMatches(mappedMatches);
       } catch (error) {
@@ -43,18 +44,6 @@ const Discover = () => {
 
     fetchMatches();
   }, []);
-
-  const handleConnect = async (userId: string, name: string) => {
-    try {
-      await api.put(`/users/follow/${userId}`);
-      toast.success(`You are now following ${name}! 🌱`);
-      // Update local state to reflect following status
-      setMatches(prev => prev.map(u => u.id === userId ? { ...u, isFollowing: true } : u));
-    } catch (error) {
-      console.error("Failed to follow user", error);
-      toast.error("Failed to follow user.");
-    }
-  };
 
   const filtered = matches.filter((u) => {
     const matchStage = filter === "all" || u.lifeStage === filter;
@@ -100,7 +89,6 @@ const Discover = () => {
               <MatchCard
                 key={user.id}
                 user={user}
-                onConnect={() => handleConnect(user.id, user.name)}
               />
             ))}
           </div>

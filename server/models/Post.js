@@ -12,18 +12,14 @@ const postSchema = new mongoose.Schema({
     },
     content: {
         type: String,
-        required: [true, 'Please add some content']
+        default: ''
     },
     growthTags: {
         type: [String],
         default: []
     },
-    media: {
-        url: String, // Path to file
-        type: {
-            type: String,
-            enum: ['image', 'video']
-        }
+    image: {
+        type: String
     },
     likes: [{
         type: mongoose.Schema.Types.ObjectId,

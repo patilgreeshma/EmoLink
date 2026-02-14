@@ -13,7 +13,44 @@ import { formatDistanceToNow } from "date-fns";
 
 const Profile = () => {
   const { user } = useAuth();
+
+  // Restoring profile state which was accidentally removed
   const [profile, setProfile] = useState<any>(null);
+
+  // List modal state
+  const [showFollowers, setShowFollowers] = useState(false);
+  const [showFollowing, setShowFollowing] = useState(false);
+
+  const UserListModal = ({ title, users, onClose }: { title: string, users: any[], onClose: () => void }) => (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-background rounded-2xl w-full max-w-sm max-h-[80vh] overflow-hidden flex flex-col shadow-xl" onClick={e => e.stopPropagation()}>
+        <div className="p-4 border-b border-border flex justify-between items-center">
+          <h3 className="font-bold text-lg">{title}</h3>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">X</button>
+        </div>
+        <div className="overflow-y-auto p-4 space-y-3">
+          {users && users.length > 0 ? users.map((u: any) => (
+            <div key={u._id} className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 overflow-hidden flex items-center justify-center text-sm font-bold text-primary">
+                {u.avatar ? (
+                  <img
+                    src={u.avatar.startsWith('http') ? u.avatar : `http://localhost:5000${u.avatar}`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  u.name.charAt(0)
+                )}
+              </div>
+              <div>
+                <p className="font-semibold text-sm">{u.name}</p>
+                <p className="text-xs text-muted-foreground">{u.lifeStage}</p>
+              </div>
+            </div>
+          )) : <p className="text-center text-muted-foreground">No users yet.</p>}
+        </div>
+      </div>
+    </div>
+  );
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -39,6 +76,7 @@ const Profile = () => {
             lifeStage: p.author.lifeStage,
           },
           content: p.content,
+          image: p.image ? (p.image.startsWith('http') ? p.image : `http://localhost:5000${p.image}`) : undefined,
           tags: p.growthTags || [],
           timestamp: formatDistanceToNow(new Date(p.createdAt), { addSuffix: true }),
           likes: p.likes.length,
@@ -61,9 +99,8 @@ const Profile = () => {
   if (loading) return <div className="text-center py-20">Loading profile...</div>;
   if (!profile) return <div className="text-center py-20">Profile not found</div>;
 
-  // Use mock communities for now as backend doesn't have joined communities endpoint easily accessible yet
-  // or we can just filter if we had the list. For MVP, keeping mock for communities part.
-  const joinedCommunities = communities.filter((c) => c.joined);
+  // Use real joined communities from profile
+  const joinedCommunities = profile.joinedCommunities || [];
 
   const userInitials = profile.name ? profile.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() : "ME";
 
@@ -75,19 +112,57 @@ const Profile = () => {
         <div className="gradient-card rounded-2xl p-8 shadow-warm-lg border border-border mb-6">
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl overflow-hidden">
+              <div className="relative group w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl overflow-hidden cursor-pointer">
+                {/* Image Upload Input */}
+                <input
+                  type="file"
+                  className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    if (e.target.files?.[0]) {
+                      const file = e.target.files[0];
+                      const formData = new FormData();
+                      formData.append('profileImage', file);
+                      try {
+                        // Optimistic update
+                        const objectUrl = URL.createObjectURL(file);
+                        setProfile((prev: any) => ({ ...prev, avatar: objectUrl }));
+
+                        const res = await api.put('/users/profile', formData, {
+                          headers: { 'Content-Type': 'multipart/form-data' }
+                        });
+                        setProfile((prev: any) => ({ ...prev, avatar: res.data.profileImage || res.data.avatar })); // Adjust based on API response
+                        toast.success("Profile picture updated!");
+                      } catch (err) {
+                        console.error("Failed to upload profile image", err);
+                        toast.error("Failed to update profile picture");
+                      }
+                    }
+                  }}
+                />
                 {profile.avatar ? (
-                  <img src={profile.avatar} alt={profile.name} className="w-full h-full object-cover" />
+                  <img
+                    src={profile.avatar.startsWith('http') ? profile.avatar : `http://localhost:5000${profile.avatar}`}
+                    alt={profile.name}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   userInitials
                 )}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                  <Pencil className="w-6 h-6 text-white" />
+                </div>
               </div>
               <div>
                 <h1 className="text-2xl font-heading font-bold text-foreground">{profile.name}</h1>
                 <p className="text-muted-foreground">{profile.lifeStage}</p>
                 <div className="flex gap-4 mt-2 text-sm">
-                  <span><strong className="text-foreground">{profile.followers?.length || 0}</strong> <span className="text-muted-foreground">Followers</span></span>
-                  <span><strong className="text-foreground">{profile.following?.length || 0}</strong> <span className="text-muted-foreground">Following</span></span>
+                  <span className="cursor-pointer hover:underline" onClick={() => setShowFollowers(true)}>
+                    <strong className="text-foreground">{profile.followers?.length || 0}</strong> <span className="text-muted-foreground">Followers</span>
+                  </span>
+                  <span className="cursor-pointer hover:underline" onClick={() => setShowFollowing(true)}>
+                    <strong className="text-foreground">{profile.following?.length || 0}</strong> <span className="text-muted-foreground">Following</span>
+                  </span>
                 </div>
               </div>
             </div>

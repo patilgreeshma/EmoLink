@@ -6,6 +6,10 @@ const communitySchema = new mongoose.Schema({
         required: [true, 'Please add a community name'],
         unique: true
     },
+    icon: {
+        type: String,
+        default: '🌱'
+    },
     description: {
         type: String,
         required: [true, 'Please add a description']

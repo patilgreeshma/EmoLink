@@ -1,25 +1,49 @@
 import Post from '../models/Post.js';
 import User from '../models/User.js';
+import cloudinary from '../config/cloudinary.js';
+import streamifier from 'streamifier';
 
 // @desc    Create a new post
 // @route   POST /api/posts
 // @access  Private
 export const createPost = async (req, res) => {
+    const { content, community, growthTags } = req.body;
+
+    // Helper function to upload to Cloudinary
+    const uploadFromBuffer = (buffer) => {
+        return new Promise((resolve, reject) => {
+            const cld_upload_stream = cloudinary.uploader.upload_stream(
+                {
+                    folder: "emolink_posts"
+                },
+                (error, result) => {
+                    if (result) {
+                        resolve(result);
+                    } else {
+                        reject(error);
+                    }
+                }
+            );
+            streamifier.createReadStream(buffer).pipe(cld_upload_stream);
+        });
+    };
+
     try {
         console.log('=== CREATE POST REQUEST ===');
         console.log('Body:', req.body);
         console.log('File:', req.file);
 
-        const { content, growthTags, community } = req.body;
+        let imageUrl = '';
 
-        let media = null;
-        if (req.file) {
-            console.log('Processing file upload...');
-            media = {
-                url: `/uploads/${req.file.filename}`,
-                type: req.file.mimetype.startsWith('video') ? 'video' : 'image'
-            };
-            console.log('Media object:', media);
+        if (req.file && req.file.buffer) {
+            console.log('Processing file upload to Cloudinary...');
+            const result = await uploadFromBuffer(req.file.buffer);
+            imageUrl = result.secure_url;
+            console.log('Image uploaded to Cloudinary:', imageUrl);
+        }
+
+        if (!content && !imageUrl) {
+            return res.status(400).json({ message: 'Please add content or an image' });
         }
 
         let parsedTags = [];
@@ -29,26 +53,24 @@ export const createPost = async (req, res) => {
                 console.log('Parsed tags:', parsedTags);
             } catch (e) {
                 console.error("Error parsing growthTags:", e);
-                parsedTags = []; // Fallback to empty array
+                parsedTags = [];
             }
         }
 
-        console.log('Creating post with user:', req.user._id);
-        const newPost = new Post({
-            author: req.user._id,
+        console.log('Creating post with user:', req.user._id || req.user.id);
+        const post = await Post.create({
+            author: req.user._id || req.user.id,
             content,
             growthTags: parsedTags,
             community: community || null,
-            media
+            image: imageUrl
         });
 
-        console.log('Saving post...');
-        const savedPost = await newPost.save();
         console.log('Post saved, populating author...');
-        await savedPost.populate('author', 'name avatar lifeStage');
+        await post.populate('author', 'name avatar lifeStage');
         console.log('Success! Returning post.');
 
-        res.status(201).json(savedPost);
+        res.status(201).json(post);
     } catch (error) {
         console.error('=== ERROR IN CREATE POST ===');
         console.error('Error message:', error.message);
@@ -115,7 +137,7 @@ export const getFeed = async (req, res) => {
     try {
         // Get all posts (Global Feed for now as requested)
         const feedPosts = await Post.find()
-            .populate('author', 'name lifeStage')
+            .populate('author', 'name lifeStage avatar')
             .populate('community', 'name')
             .sort({ createdAt: -1 });
 
@@ -131,7 +153,7 @@ export const getFeed = async (req, res) => {
 export const getUserPosts = async (req, res) => {
     try {
         const posts = await Post.find({ author: req.params.userId })
-            .populate('author', 'name lifeStage')
+            .populate('author', 'name lifeStage avatar')
             .sort({ createdAt: -1 });
 
         res.status(200).json(posts);
@@ -193,13 +215,14 @@ export const commentPost = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
 // @desc    Get posts by community ID
 // @route   GET /api/posts/community/:communityId
 // @access  Private
 export const getCommunityPosts = async (req, res) => {
     try {
         const posts = await Post.find({ community: req.params.communityId })
-            .populate('author', 'name lifeStage')
+            .populate('author', 'name lifeStage avatar')
             .populate('community', 'name')
             .sort({ createdAt: -1 });
 

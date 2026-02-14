@@ -8,7 +8,9 @@ export const getUserProfile = async (req, res) => {
         const user = await User.findById(req.params.id)
             .select('-password')
             .populate('following', 'name avatar lifeStage')
-            .populate('followers', 'name avatar lifeStage');
+            .populate('following', 'name avatar lifeStage')
+            .populate('followers', 'name avatar lifeStage')
+            .populate('joinedCommunities', 'name icon');
 
         if (user) {
             res.json(user);
@@ -32,7 +34,13 @@ export const updateUserProfile = async (req, res) => {
             user.lifeStage = req.body.lifeStage || user.lifeStage;
             user.growthGoals = req.body.growthGoals || user.growthGoals;
             user.strengths = req.body.strengths || user.strengths;
+            user.growthGoals = req.body.growthGoals || user.growthGoals;
+            user.strengths = req.body.strengths || user.strengths;
             user.growthStatement = req.body.growthStatement || user.growthStatement;
+
+            if (req.file) {
+                user.profileImage = `/uploads/${req.file.filename}`;
+            }
 
             const updatedUser = await user.save();
 
@@ -77,6 +85,20 @@ export const followUser = async (req, res) => {
         await User.findByIdAndUpdate(req.user.id, {
             $addToSet: { following: req.params.id }
         });
+
+        // Check for mutual follow to create chat
+        if (userToFollow.following.some(id => id.toString() === req.user.id)) {
+            const existingChat = await Chat.findOne({
+                participants: { $all: [req.user.id, req.params.id] }
+            });
+
+            if (!existingChat) {
+                await Chat.create({
+                    participants: [req.user.id, req.params.id],
+                    lastMessage: ''
+                });
+            }
+        }
 
         res.status(200).json({ message: 'User has been followed' });
     } catch (error) {

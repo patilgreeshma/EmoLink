@@ -1,5 +1,5 @@
-export type LifeStage = "Student" | "Early Career" | "Mid Career" | "Founder" | "Career Break";
 
+export type LifeStage = "Healing" | "Building confidence" | "Finding purpose" | "Managing anxiety" | "Expanding social circle" | "Reinventing myself" | "Other";
 export const growthGoals = [
   "Building confidence",
   "Managing burnout",
@@ -23,6 +23,7 @@ export interface UserProfile {
   followers: number;
   following: number;
   isFollowing?: boolean;
+  matchReason?: string;
 }
 
 export interface ChatMessage {
@@ -54,6 +55,7 @@ export interface Post {
   liked?: boolean;
   communityId?: string;
   communityName?: string;
+  image?: string;
 }
 
 export interface Community {
@@ -69,7 +71,7 @@ export interface Community {
 export const currentUser: UserProfile = {
   id: "me",
   name: "Alex Rivera",
-  lifeStage: "Early Career",
+  lifeStage: "Building confidence",
   goals: ["Building confidence", "Career clarity", "Improving communication skills"],
   growthStatement: "I'm on a journey to find my authentic voice and build meaningful professional relationships.",
   avatar: "AR",
@@ -77,80 +79,19 @@ export const currentUser: UserProfile = {
   following: 89,
 };
 
-export const matchedUsers: (UserProfile & { compatibility: number })[] = [
+export const matchedUsers: UserProfile[] = [
   {
     id: "1",
-    name: "Maya Chen",
-    lifeStage: "Mid Career",
-    goals: ["Building confidence", "Public speaking improvement", "Career clarity"],
-    growthStatement: "Learning to lead with empathy and authenticity.",
-    avatar: "MC",
-    compatibility: 85,
-    followers: 312,
-    following: 156,
-    isFollowing: true,
-  },
-  {
-    id: "2",
-    name: "Jordan Kim",
-    lifeStage: "Student",
-    goals: ["Career clarity", "Improving communication skills", "Stress management"],
-    growthStatement: "Figuring out my path while staying grounded.",
-    avatar: "JK",
-    compatibility: 78,
-    followers: 89,
-    following: 42,
-    isFollowing: false,
-  },
-  {
-    id: "3",
-    name: "Sam Patel",
-    lifeStage: "Founder",
-    goals: ["Managing burnout", "Work-life balance", "Building confidence"],
-    growthStatement: "Building something meaningful without losing myself.",
-    avatar: "SP",
-    compatibility: 72,
-    followers: 534,
-    following: 201,
-    isFollowing: true,
-  },
-  {
-    id: "4",
-    name: "Riley Brooks",
-    lifeStage: "Career Break",
-    goals: ["Overcoming fear of failure", "Career clarity", "Building confidence"],
-    growthStatement: "Taking a pause to reconnect with what truly matters.",
-    avatar: "RB",
-    compatibility: 68,
-    followers: 67,
-    following: 34,
-    isFollowing: false,
-  },
-  {
-    id: "5",
-    name: "Taylor Nguyen",
-    lifeStage: "Early Career",
-    goals: ["Improving communication skills", "Building confidence", "Stress management"],
-    growthStatement: "Growing into my potential one conversation at a time.",
-    avatar: "TN",
-    compatibility: 82,
-    followers: 198,
-    following: 121,
-    isFollowing: true,
-  },
-  {
-    id: "6",
-    name: "Avery Williams",
-    lifeStage: "Mid Career",
-    goals: ["Work-life balance", "Managing burnout", "Public speaking improvement"],
-    growthStatement: "Seeking harmony between ambition and well-being.",
-    avatar: "AW",
-    compatibility: 65,
-    followers: 245,
-    following: 178,
-    isFollowing: false,
+    name: "Alex Rivera",
+    lifeStage: "Building confidence",
+    goals: ["Building confidence", "Career clarity", "Improving communication skills"],
+    growthStatement: "I'm on a journey to find my authentic voice and build meaningful professional relationships.",
+    avatar: "AR",
+    followers: 124,
+    following: 89,
   },
 ];
+
 
 export const feedPosts: Post[] = [
   {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Post, matchedUsers, currentUser } from "@/data/mockData";
+
 import GoalTag from "./GoalTag";
 import { Heart, MessageCircle, MoreHorizontal, Trash2, Edit2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -39,7 +39,6 @@ const PostCard = ({ post, onDelete }: PostCardProps) => {
   // Author is now fully populated from Feed.tsx
   const author: any = post.author;
   const isAuthor = user?._id === author._id || user?._id === author.id;
-
 
   // Handle both id and _id fields (Feed maps _id to id, CommunityPage might use _id)
   const postId = post.id || post._id;
@@ -128,14 +127,10 @@ const PostCard = ({ post, onDelete }: PostCardProps) => {
 
         <p className="text-sm text-foreground leading-relaxed mb-3">{post.content}</p>
 
-        {/* Media Display */}
-        {post.media && (
+        {/* Image Display - using 'image' field from cloudinary */}
+        {post.image && (
           <div className="mb-4 rounded-xl overflow-hidden bg-muted/20 border border-border">
-            {post.media.type === 'video' ? (
-              <video src={`http://localhost:8080${post.media.url}`} controls className="w-full max-h-[400px] object-contain" />
-            ) : (
-              <img src={`http://localhost:8080${post.media.url}`} alt="Post media" className="w-full max-h-[400px] object-cover" />
-            )}
+            <img src={post.image} alt="Post image" className="w-full max-h-[400px] object-cover" />
           </div>
         )}
 

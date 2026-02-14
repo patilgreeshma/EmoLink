@@ -36,6 +36,11 @@ const MatchCard = ({ user, onConnect }: MatchCardProps) => {
       </div>
 
       <div className="mb-4">
+        {user.matchReason && (
+          <p className="text-sm text-primary/80 italic mb-3 bg-primary/5 p-2 rounded-lg border-l-2 border-primary">
+            "{user.matchReason}"
+          </p>
+        )}
         <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Shared Goals</p>
         <div className="flex flex-wrap gap-1.5">
           {user.goals.map((goal) => (
@@ -50,10 +55,17 @@ const MatchCard = ({ user, onConnect }: MatchCardProps) => {
       </div>
 
       <div className="flex gap-2">
-        <Button onClick={onConnect} className="flex-1 rounded-full" size="sm">
-          Connect
-        </Button>
-        <FollowButton initialFollowing={user.isFollowing} size="sm" />
+        <FollowButton
+          userId={user.id}
+          initialFollowing={user.isFollowing}
+          className="flex-1"
+          size="sm"
+          onToggle={(isFollowing) => {
+            // This is a simple way to update counts locally
+            user.followers = isFollowing ? user.followers + 1 : user.followers - 1;
+            user.isFollowing = isFollowing;
+          }}
+        />
       </div>
     </div>
   );

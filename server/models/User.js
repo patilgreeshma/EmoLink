@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
     },
     lifeStage: {
         type: String,
-        enum: ['Student', 'Early Career', 'Mid Career', 'Executive', 'Retirement', 'Transition', 'Other'],
+        enum: ["Healing", "Building confidence", "Finding purpose", "Managing anxiety", "Expanding social circle", "Reinventing myself", "Other"],
         default: 'Other'
     },
     growthGoals: {

@@ -2,7 +2,8 @@ import express from 'express';
 import {
     createCommunity,
     getCommunities,
-    joinCommunity
+    joinCommunity,
+    getCommunityById
 } from '../controllers/communityController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -10,6 +11,7 @@ const router = express.Router();
 
 router.post('/', protect, createCommunity);
 router.get('/', protect, getCommunities);
+router.get('/:id', protect, getCommunityById);
 router.post('/:id/join', protect, joinCommunity);
 
 export default router;

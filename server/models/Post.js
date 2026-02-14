@@ -18,6 +18,13 @@ const postSchema = new mongoose.Schema({
         type: [String],
         default: []
     },
+    media: {
+        url: String, // Path to file
+        type: {
+            type: String,
+            enum: ['image', 'video']
+        }
+    },
     likes: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'

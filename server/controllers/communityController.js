@@ -68,3 +68,19 @@ export const joinCommunity = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+// @desc    Get community by ID
+// @route   GET /api/communities/:id
+// @access  Private
+export const getCommunityById = async (req, res) => {
+    try {
+        const community = await Community.findById(req.params.id).populate('members', 'name');
+
+        if (community) {
+            res.status(200).json(community);
+        } else {
+            res.status(404).json({ message: 'Community not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

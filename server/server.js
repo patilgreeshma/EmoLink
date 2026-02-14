@@ -33,6 +33,15 @@ const io = new Server(httpServer, {
 // Middleware
 app.use(express.json());
 app.use(cors());
+
+// Serve static files from uploads directory
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// Serve uploads folder. Note: server.js is in /server, so uploads is in ../uploads relative to this file? 
+// Actually process.cwd() is usually root. Let's use path.join(process.cwd(), 'uploads')
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use(helmet());
 app.use(morgan('dev'));
 

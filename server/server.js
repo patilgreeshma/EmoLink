@@ -66,7 +66,7 @@ if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(rootDir, 'dist')));
 
     // Handle React routing, return all requests to index.html
-    app.get('*', (req, res) => {
+    app.get(/(.*)/, (req, res) => {
         res.sendFile(path.join(rootDir, 'dist', 'index.html'));
     });
 } else {

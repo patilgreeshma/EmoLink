@@ -5,7 +5,11 @@ import User from '../models/User.js';
 // @access  Private
 export const getUserProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id).select('-password');
+        const user = await User.findById(req.params.id)
+            .select('-password')
+            .populate('following', 'name avatar lifeStage')
+            .populate('followers', 'name avatar lifeStage');
+
         if (user) {
             res.json(user);
         } else {

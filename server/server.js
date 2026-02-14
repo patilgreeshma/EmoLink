@@ -5,6 +5,8 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import connectDB from './config/db.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 
 // Route imports
 import authRoutes from './routes/authRoutes.js';
@@ -20,6 +22,13 @@ dotenv.config();
 connectDB();
 
 const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+    cors: {
+        origin: "http://localhost:5173", // Frontend URL
+        methods: ["GET", "POST"]
+    }
+});
 
 // Middleware
 app.use(express.json());
@@ -39,6 +48,39 @@ app.use('/api/search', searchRoutes);
 // Error Middleware
 app.use(errorHandler);
 
+// Socket.io connection logic
+io.on("connection", (socket) => {
+    console.log("Connected to socket.io");
+
+    socket.on("setup", (userData) => {
+        socket.join(userData._id);
+        console.log("User joined user-room:", userData._id);
+        socket.emit("connected");
+    });
+
+    socket.on("join_chat", (room) => {
+        socket.join(room);
+        console.log("User joined chat-room: " + room);
+    });
+
+    socket.on("new_message", (newMessageRecieved) => {
+        var chat = newMessageRecieved.chatId;
+
+        if (!chat.participants) return console.log("chat.participants not defined");
+
+        chat.participants.forEach((user) => {
+            if (user._id == newMessageRecieved.sender._id) return;
+
+            socket.in(user._id).emit("message_received", newMessageRecieved);
+        });
+    });
+
+    socket.on("off_setup", () => {
+        console.log("USER DISCONNECTED");
+        socket.leave(userData._id);
+    });
+});
+
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+httpServer.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -61,14 +61,18 @@ export const sendMessage = async (req, res) => {
             chatId: chatId
         });
 
-        message = await message.populate('sender', 'name pic');
-        message = await message.populate('chatId');
-        message = await User.populate(message, {
-            path: 'chatId.participants',
-            select: 'name pic email'
-        });
+        // Populate needed fields
+        const fullMessage = await Message.findById(message._id)
+            .populate('sender', 'name pic')
+            .populate({
+                path: 'chatId',
+                populate: {
+                    path: 'participants',
+                    select: 'name pic email'
+                }
+            });
 
-        res.json(message);
+        res.json(fullMessage);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -79,9 +83,20 @@ export const sendMessage = async (req, res) => {
 // @access  Private
 export const getMessages = async (req, res) => {
     try {
+        // First check if user is participant
+        const chat = await Chat.findById(req.params.chatId);
+        if (!chat) {
+            return res.status(404).json({ message: 'Chat not found' });
+        }
+
+        if (!chat.participants.includes(req.user.id)) {
+            return res.status(403).json({ message: 'Not authorized to view this chat' });
+        }
+
         const messages = await Message.find({ chatId: req.params.chatId })
             .populate('sender', 'name pic email')
-            .populate('chatId');
+            .sort({ createdAt: 1 }); // Sort by oldest first for chat history
+
         res.json(messages);
     } catch (error) {
         res.status(500).json({ message: error.message });

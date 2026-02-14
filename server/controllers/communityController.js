@@ -54,15 +54,14 @@ export const joinCommunity = async (req, res) => {
             return res.status(404).json({ message: 'Community not found' });
         }
 
-        if (community.members.includes(req.user.id)) {
-            return res.status(400).json({ message: 'Already a member' });
-        }
+        // Use $addToSet to prevent duplicates at database level
+        await Community.findByIdAndUpdate(req.params.id, {
+            $addToSet: { members: req.user.id }
+        });
 
-        community.members.push(req.user.id);
-        await community.save();
-
-        user.joinedCommunities.push(community._id);
-        await user.save();
+        await User.findByIdAndUpdate(req.user.id, {
+            $addToSet: { joinedCommunities: community._id }
+        });
 
         res.status(200).json({ message: 'Joined community' });
     } catch (error) {

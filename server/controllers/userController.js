@@ -65,13 +65,16 @@ export const followUser = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        if (!userToFollow.followers.includes(req.user.id)) {
-            await userToFollow.updateOne({ $push: { followers: req.user.id } });
-            await currentUser.updateOne({ $push: { following: req.params.id } });
-            res.status(200).json({ message: 'User has been followed' });
-        } else {
-            res.status(400).json({ message: 'You already follow this user' });
-        }
+        // Use atomic updates
+        await User.findByIdAndUpdate(req.params.id, {
+            $addToSet: { followers: req.user.id }
+        });
+
+        await User.findByIdAndUpdate(req.user.id, {
+            $addToSet: { following: req.params.id }
+        });
+
+        res.status(200).json({ message: 'User has been followed' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -93,13 +96,16 @@ export const unfollowUser = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        if (userToUnfollow.followers.includes(req.user.id)) {
-            await userToUnfollow.updateOne({ $pull: { followers: req.user.id } });
-            await currentUser.updateOne({ $pull: { following: req.params.id } });
-            res.status(200).json({ message: 'User has been unfollowed' });
-        } else {
-            res.status(400).json({ message: 'You dont follow this user' });
-        }
+        // Use atomic updates
+        await User.findByIdAndUpdate(req.params.id, {
+            $pull: { followers: req.user.id }
+        });
+
+        await User.findByIdAndUpdate(req.user.id, {
+            $pull: { following: req.params.id }
+        });
+
+        res.status(200).json({ message: 'User has been unfollowed' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

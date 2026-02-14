@@ -40,6 +40,12 @@ export interface ChatThread {
 export interface Post {
   id: string;
   authorId: string;
+  author?: {
+    id: string;
+    name: string;
+    avatar: string;
+    lifeStage: string;
+  };
   content: string;
   tags: GrowthGoal[];
   timestamp: string;
@@ -47,6 +53,7 @@ export interface Post {
   comments: number;
   liked?: boolean;
   communityId?: string;
+  communityName?: string;
 }
 
 export interface Community {

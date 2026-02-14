@@ -30,7 +30,7 @@ const App = () => (
             <Route path="/goals" element={<GoalSelection />} />
             <Route path="/feed" element={<Feed />} />
             <Route path="/discover" element={<Discover />} />
-            <Route path="/communitites" element={<Communities />} />
+            <Route path="/communities" element={<Communities />} />
             <Route path="/communities/:id" element={<CommunityPage />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/profile" element={<Profile />} />

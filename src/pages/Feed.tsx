@@ -16,7 +16,9 @@ const Feed = () => {
 
   const fetchPosts = async () => {
     try {
+      console.log("Fetching global feed...");
       const { data } = await api.get("/posts/feed");
+      console.log("Feed data received:", data.length, "posts");
       // Map backend data to frontend Post interface
       const mappedPosts = data.map((p: any) => ({
         id: p._id,
@@ -33,12 +35,14 @@ const Feed = () => {
         likes: p.likes.length,
         comments: p.comments.length,
         liked: p.likes.includes(user?._id),
+        communityId: p.community?._id,
+        communityName: p.community?.name // Add community name for display if needed
       }));
       setPosts(mappedPosts);
     } catch (error) {
       console.error("Failed to fetch posts", error);
-      // Fallback to mock data if API fails to avoid empty screen during dev
-      setPosts(feedPosts);
+      // Fallback removed to show real state
+      setPosts([]);
     } finally {
       setLoading(false);
     }
@@ -67,6 +71,7 @@ const Feed = () => {
 
           {/* Center Feed */}
           <div className="space-y-4">
+            <h1 className="text-2xl font-bold font-heading mb-4">Global Community Feed</h1>
             <CreatePost onPost={handleNewPost} />
             {loading ? (
               <p className="text-center text-muted-foreground">Loading feed...</p>

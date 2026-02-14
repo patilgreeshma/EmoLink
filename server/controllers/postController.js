@@ -13,7 +13,8 @@ export const createPost = async (req, res) => {
         const post = await Post.create({
             author: req.user.id,
             content: req.body.content,
-            growthTags: req.body.growthTags
+            growthTags: req.body.growthTags,
+            community: req.body.community || null
         });
 
         res.status(201).json(post);
@@ -27,19 +28,11 @@ export const createPost = async (req, res) => {
 // @access  Private
 export const getFeed = async (req, res) => {
     try {
-        const currentUser = await User.findById(req.user.id);
-
-        // Get posts from users followed by current user
-        const followingPosts = await Post.find({ author: { $in: currentUser.following } })
+        // Get all posts (Global Feed for now as requested)
+        const feedPosts = await Post.find()
             .populate('author', 'name lifeStage')
+            .populate('community', 'name')
             .sort({ createdAt: -1 });
-
-        const myPosts = await Post.find({ author: req.user.id }).populate('author', 'name lifeStage');
-
-        let feedPosts = [...followingPosts, ...myPosts];
-
-        // Sort by date desc
-        feedPosts.sort((a, b) => b.createdAt - a.createdAt);
 
         res.status(200).json(feedPosts);
     } catch (error) {

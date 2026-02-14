@@ -58,6 +58,22 @@ const __dirname = path.dirname(__filename);
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+    // Serve static files from the dist directory (Vite build output)
+    // The dist folder is in the root, one level up from server/
+    const rootDir = path.resolve(__dirname, '../');
+    app.use(express.static(path.join(rootDir, 'dist')));
+
+    // Handle React routing, return all requests to index.html
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(rootDir, 'dist', 'index.html'));
+    });
+} else {
+    app.get('/', (req, res) => {
+        res.send('API is running...');
+    });
+}
 // Error Middleware
 app.use(errorHandler);
 
